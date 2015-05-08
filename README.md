@@ -1,8 +1,8 @@
 # match-case
-ML-style pattern matching in C++.
+ML-style pattern matching in C++.  
 The code has been compiled in MSVC-2005-CTP & g++-4.9.1(-std=c++1y).
  
-For using it, you only need to include match.hpp.
+For using it, you only need to include match.hpp.  
 Some examples:
 
     /*
@@ -93,10 +93,10 @@ Some examples:
     }
     #include "match.hpp"
 
-Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:
-http://www.stroustrup.com/OpenPatternMatching.pdf
-And we can find their codes here:
-http://parasol.tamu.edu/mach7/
-Their library is very powerful and big, maybe a little complicated.
-Compared with their library, mine is very small and simple. I wrote only 170 lines of code for mine library.
+Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:  
+http://www.stroustrup.com/OpenPatternMatching.pdf  
+And we can find their codes here:  
+http://parasol.tamu.edu/mach7/  
+Their library is very powerful and big, maybe a little complicated.  
+Compared with their library, mine is very small and simple. I wrote only 170 lines of code for mine library.  
 If you just want to use a pattern matching in C++ quickly, and don't like to read doc & study usage, maybe you could try my library.
