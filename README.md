@@ -97,6 +97,9 @@ Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:
 http://www.stroustrup.com/OpenPatternMatching.pdf  
 And we can find their codes here:  
 http://parasol.tamu.edu/mach7/  
+ 
 Their library is very powerful and big, maybe a little complicated.  
-Compared with their library, mine is very small and simple. I wrote only 170 lines of code for mine library.  
+Compared with their library, mine is very small and simple.  
+I wrote only 170 lines of code for mine library.  
+ 
 If you just want to use a pattern matching in C++ quickly, and don't like to read doc & study usage, maybe you could try my library.
