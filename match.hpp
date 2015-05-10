@@ -266,14 +266,14 @@ struct bindings_base
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<std::is_pointer<typename std::remove_reference<U>::type>::value, bool>::type
+        -> typename std::enable_if<std::is_pointer<typename underly<U>::type>::value, bool>::type
     {
         return apply<0>(tp, *std::forward<U>(tar));
     }
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<!std::is_pointer<typename std::remove_reference<U>::type>::value, bool>::type
+        -> typename std::enable_if<!std::is_pointer<typename underly<U>::type>::value, bool>::type
     {
         return apply<0>(tp, std::forward<U>(tar));
     }
@@ -305,13 +305,6 @@ struct constructor : type<C>
 
 template <typename C, typename... T>
 struct is_pattern<constructor<C, T...>> : std::true_type{};
-
-template <typename T = wildcard, typename... P>
-inline auto C(P&&... args)
-    -> constructor<T, decltype(filter(std::forward<P>(args)))...>
-{
-    return { filter(std::forward<P>(args))... };
-}
 
 #define MATCH_REGIST_TYPE(TYPE, ...)                                      \
     namespace match                                                       \
@@ -366,6 +359,18 @@ inline auto filter(T&& arg)
     return converter(std::forward<T>(arg));
 }
 
+/*
+ * Here is a part of the constructor pattern, and I have to implement it here.
+ * Because gcc needs the filter be declared before it.
+*/
+
+template <typename T = wildcard, typename... P>
+inline auto C(P&&... args)
+    -> constructor<T, decltype(filter(std::forward<P>(args)))...>
+{
+    return { filter(std::forward<P>(args))... };
+}
+
 } // namespace match
 
 #define Match(...)                                         \
@@ -374,8 +379,12 @@ inline auto filter(T&& arg)
         if (false)
 
 #define MATCH_CASE_ARG_(N, ...) && ( match::filter( CAPO_PP_A_(N, __VA_ARGS__) )( std::get<N - 1>(target_) ) )
-#define Case(...) \
-        } else if ( true CAPO_PP_REPEAT_(CAPO_PP_COUNT_(__VA_ARGS__), MATCH_CASE_ARG_, __VA_ARGS__) ) {
+#define P(...)                  ( true CAPO_PP_REPEAT_(CAPO_PP_COUNT_(__VA_ARGS__), MATCH_CASE_ARG_, __VA_ARGS__) )
+
+#define With(...) \
+        } else if (__VA_ARGS__) {
+
+#define Case(...) With( P(__VA_ARGS__) )
 
 #define Otherwise() \
         } else {

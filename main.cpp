@@ -147,26 +147,57 @@ void test_constructor(void)
     tr.destroy();
 }
 
-//void test_or_and(void)
-//{
-//    TEST_CASE_();
-//
-//    auto detect_zero_or = [](auto x, auto y)
-//    {
-//        Match(x, y)
-//        {
-//            Case(0, 0)Or(0, _)
-//                std::cout << "Zero found." << std::endl;
-//            Otherwise()
-//                std::cout << "Both nonzero." << std::endl;
-//        }
-//        EndMatch
-//    };
-//    detect_zero_or(0, 0);
-//    detect_zero_or(1, 0);
-//    detect_zero_or(0, 10);
-//    detect_zero_or(10, 15);
-//}
+void test_or_and_guard(void)
+{
+    TEST_CASE_();
+
+    auto detect_zero_or = [](auto x, auto y)
+    {
+        Match(x, y)
+        {
+            With( P(0, 0) || P(0, _) || P(_, 0) )
+                std::cout << "Zero found." << std::endl;
+            Otherwise()
+                std::cout << "Both nonzero." << std::endl;
+        }
+        EndMatch
+    };
+    detect_zero_or(0, 0);
+    detect_zero_or(1, 0);
+    detect_zero_or(0, 10);
+    detect_zero_or(10, 15);
+
+    auto detect_zero_and = [](auto x, auto y)
+    {
+        decltype(x) a; decltype(y) b;
+        Match(x, y)
+        {
+            Case(0, 0)
+                std::cout << "Both values zero." << std::endl;
+            With( P(a, b) && P(0, _) )
+                std::cout << "First value is 0 in (" << a << ", " << b << ")" << std::endl;
+            With( P(a, b) && P(_, 0) )
+                std::cout << "Second value is 0 in (" << a << ", " << b << ")" << std::endl;
+            Otherwise()
+                std::cout << "Both nonzero." << std::endl;
+        }
+        EndMatch
+    };
+    detect_zero_and(0, 0);
+    detect_zero_and(1, 0);
+    detect_zero_and(0, 10);
+    detect_zero_and(10, 15);
+
+    int a = 3, b = 321, c;
+    Match(a, b)
+    {
+        With(P(3, c) && 3 < c) std::cout << 1 << " -- " << c << std::endl;
+        Case  (1, 2)           std::cout << 2 << std::endl;
+        With(P(3, c) && 3 > c) std::cout << 3 << " -- " << c << std::endl;
+        Otherwise()            std::cout << "Otherwise..." << std::endl;
+    }
+    EndMatch
+}
 
 int main(void)
 {
@@ -174,7 +205,7 @@ int main(void)
     test_predicate();
     test_type();
     test_constructor();
-    //test_or_and();
+    test_or_and_guard();
     std::cout << std::endl;
 	return 0;
 }
