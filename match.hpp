@@ -317,6 +317,46 @@ struct is_pattern<constructor<C, T...>> : std::true_type{};
     }
 
 /*
+ * Sequence pattern
+*/
+
+template <typename... T>
+struct sequence
+{
+    std::tuple<T...> tp_;
+
+    template <typename... U>
+    sequence(U&&... args)
+        : tp_(std::forward<U>(args)...)
+    {}
+
+    template <size_t N, typename U, typename It>
+    auto apply(U&&, It&&) const
+        -> typename std::enable_if<(sizeof...(T) <= N), bool>::type
+    {
+        return true;
+    }
+
+    template <size_t N, typename U, typename It>
+    auto apply(U&& tar, It&& it) const
+        -> typename std::enable_if<(sizeof...(T) > N), bool>::type
+    {
+        if ( it == tar.end() )       return false;
+        if ( std::get<N>(tp_)(*it) ) return apply<N + 1>(std::forward<U>(tar), ++it);
+        return false;
+    }
+
+    template <typename U>
+    bool operator()(U&& tar) const
+    {
+        return apply<0>(std::forward<U>(tar), tar.begin());
+    }
+};
+
+template <typename... T>
+struct is_pattern<sequence<T...>> : std::true_type{};
+
+/*
  * "filter" is a common function used to provide convenience to the users by converting 
  * constant values into constant patterns and regular variables into variable patterns.
  * If the users defined a suitable converter for a specific type, the filter would choose
@@ -360,13 +400,20 @@ inline auto filter(T&& arg)
 }
 
 /*
- * Here is a part of the constructor pattern, and I have to implement it here.
- * Because gcc needs the filter be declared before it.
+ * Here is a part of the constructor & sequence pattern.
+ * I have to implement it here, because gcc needs the filter be declared before it.
 */
 
 template <typename T = wildcard, typename... P>
 inline auto C(P&&... args)
     -> constructor<T, decltype(filter(std::forward<P>(args)))...>
+{
+    return { filter(std::forward<P>(args))... };
+}
+
+template <typename... P>
+inline auto S(P&&... args)
+    -> sequence<decltype(filter(std::forward<P>(args)))...>
 {
     return { filter(std::forward<P>(args))... };
 }

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <string>
 #include <functional>
-#include <type_traits>
 
 #define TEST_CASE_()                                           \
     std::cout << std::endl << __func__ << " ->:" << std::endl; \
@@ -121,14 +120,7 @@ void test_constructor(void)
 {
     TEST_CASE_();
 
-    xx_t xx;
-
-    auto  x0 = bindings<xx_t>::layout_t::get<0>(xx);
-    auto  x1 = bindings<xx_t>::layout_t::get<1>(xx);
-    auto  x2 = bindings<xx_t>::layout_t::get<2>(xx);
-    auto& x3 = bindings<xx_t>::layout_t::get<3>(xx);
-
-    int a;
+    xx_t xx; int a;
     Match(xx)
     {
         Case(C<xx_t>(_, 2.0, nullptr, _)) std::cout << "(_, 2.0, nullptr, _)" << std::endl;
@@ -137,7 +129,6 @@ void test_constructor(void)
     EndMatch
 
     tree tr = { new node{ "root", new node{ "left", nullptr, nullptr }, new node{ "right", nullptr, nullptr } } };
-    bool xt = C<node*>("root", _, C<node*>("right", nullptr, nullptr))(tr.root_);
     Match(tr)
     {
         Case( C(C<node*>(_, C<node*>("left", _, _), C<node*>("right", nullptr, nullptr))) )
@@ -147,12 +138,37 @@ void test_constructor(void)
     tr.destroy();
 }
 
+#include <list>
+void test_sequence(void)
+{
+    TEST_CASE_();
+
+    std::list<int> ll = { 1, 2, 3 };
+    Match(ll)
+    {
+        Case(S(1, _, _)) std::cout << "{ 1, 2, 3 } matchs: " << "(1, _, _)" << std::endl;
+        Case(S(_, 1, _)) std::cout << "{ 1, 2, 3 } matchs: " << "(_, 1, _)" << std::endl;
+        Case(S(_, _, 1)) std::cout << "{ 1, 2, 3 } matchs: " << "(_, _, 1)" << std::endl;
+    }
+    EndMatch
+
+    auto il = { 3, 2, 1 };
+    Match(il)
+    {
+        Case(S(1, _, _)) std::cout << "{ 3, 2, 1 } matchs: " << "(1, _, _)" << std::endl;
+        Case(S(_, 1, _)) std::cout << "{ 3, 2, 1 } matchs: " << "(_, 1, _)" << std::endl;
+        Case(S(_, _, 1)) std::cout << "{ 3, 2, 1 } matchs: " << "(_, _, 1)" << std::endl;
+    }
+    EndMatch
+}
+
 void test_or_and_guard(void)
 {
     TEST_CASE_();
 
     auto detect_zero_or = [](auto x, auto y)
     {
+        std::cout << "(" << x << ", " << y << ") ->: ";
         Match(x, y)
         {
             With( P(0, 0) || P(0, _) || P(_, 0) )
@@ -169,6 +185,7 @@ void test_or_and_guard(void)
 
     auto detect_zero_and = [](auto x, auto y)
     {
+        std::cout << "(" << x << ", " << y << ") ->: ";
         decltype(x) a; decltype(y) b;
         Match(x, y)
         {
@@ -205,7 +222,8 @@ int main(void)
     test_predicate();
     test_type();
     test_constructor();
+    test_sequence();
     test_or_and_guard();
     std::cout << std::endl;
-	return 0;
+    return 0;
 }
