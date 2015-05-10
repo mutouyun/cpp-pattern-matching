@@ -101,6 +101,22 @@ struct xx_t
 };
 MATCH_REGIST_TYPE(xx_t, int, double, xx_t*, Foo)
 
+struct node
+{
+    std::string v_;
+    node* l_;
+    node* r_;
+    void destroy(void) { if (l_) l_->destroy(); if (r_) r_->destroy(); delete this; }
+};
+MATCH_REGIST_TYPE(node, std::string, node*, node*)
+
+struct tree
+{
+    node* root_;
+    void destroy(void) { if (root_) root_->destroy(); }
+};
+MATCH_REGIST_TYPE(tree, node*)
+
 void test_constructor(void)
 {
     TEST_CASE_();
@@ -115,11 +131,42 @@ void test_constructor(void)
     int a;
     Match(xx)
     {
-        Case(Cons<xx_t>(_, 2.0, nullptr, _)) std::cout << "(_, 2.0, nullptr, _)" << std::endl;
-        Case(Cons<xx_t>(a, _  , nullptr, _)) std::cout << "(a, _, nullptr, _): a = " << a << std::endl;
+        Case(C<xx_t>(_, 2.0, nullptr, _)) std::cout << "(_, 2.0, nullptr, _)" << std::endl;
+        Case(C<xx_t>(a, _  , nullptr, _)) std::cout << "(a, _, nullptr, _): a = " << a << std::endl;
     }
     EndMatch
+
+    tree tr = { new node{ "root", new node{ "left", nullptr, nullptr }, new node{ "right", nullptr, nullptr } } };
+    bool xt = C<node*>("root", _, C<node*>("right", nullptr, nullptr))(tr.root_);
+    Match(tr)
+    {
+        Case( C(C<node*>(_, C<node*>("left", _, _), C<node*>("right", nullptr, nullptr))) )
+            std::cout << "bingo" << std::endl;
+    }
+    EndMatch
+    tr.destroy();
 }
+
+//void test_or_and(void)
+//{
+//    TEST_CASE_();
+//
+//    auto detect_zero_or = [](auto x, auto y)
+//    {
+//        Match(x, y)
+//        {
+//            Case(0, 0)Or(0, _)
+//                std::cout << "Zero found." << std::endl;
+//            Otherwise()
+//                std::cout << "Both nonzero." << std::endl;
+//        }
+//        EndMatch
+//    };
+//    detect_zero_or(0, 0);
+//    detect_zero_or(1, 0);
+//    detect_zero_or(0, 10);
+//    detect_zero_or(10, 15);
+//}
 
 int main(void)
 {
@@ -127,6 +174,7 @@ int main(void)
     test_predicate();
     test_type();
     test_constructor();
+    //test_or_and();
     std::cout << std::endl;
 	return 0;
 }

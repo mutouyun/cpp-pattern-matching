@@ -1,7 +1,6 @@
 #pragma once
 
 #include "capo/preprocessor.hpp"
-#include "capo/type_list.hpp"
 
 #include <utility>     // std::forward
 #include <tuple>       // std::tuple
@@ -35,7 +34,7 @@ struct constant
     template <typename U>
     bool operator()(U&& tar) const
     {
-        return (t_ == std::forward<U>(tar));
+        return (std::forward<U>(tar) == t_);
     }
 };
 
@@ -141,6 +140,16 @@ template <typename T> inline       T* addr(      T& t) { return std::addressof(t
 template <typename T, bool = std::is_polymorphic<typename underly<T>::type>::value>
 struct type;
 
+template <>
+struct type<wildcard, false>
+{
+    template <typename U>
+    bool operator()(U&&) const
+    {
+        return true;
+    }
+};
+
 template <typename T>
 struct type<T, false>
 {
@@ -182,29 +191,37 @@ template <typename T1, typename... T>
 struct model<T1, T...> : model<T...> { T1 m_; };
 
 template <typename Tp, size_t N>
-struct strip;
-
-template <template <typename...> class Tp, typename T1, typename... T, size_t N>
-struct strip<Tp<T1, T...>, N>
-     : strip<Tp<T...>, N - 1>
-{};
-
-template <template <typename...> class Tp, typename T1, typename... T>
-struct strip<Tp<T1, T...>, 0>
-{
-    using type = Tp<T1, T...>;
-};
+struct model_strip;
+template <typename T1, typename... T, size_t N>
+struct model_strip<model<T1, T...>, N> : model_strip<model<T...>, N - 1> {};
+template <typename T1, typename... T>
+struct model_strip<model<T1, T...>, 0> { using type = model<T1, T...>; };
+template <typename Tp>
+struct model_strip<Tp, 0>              { using type = Tp; };
 
 template <typename Tp>
-struct strip<Tp, 0>
+struct model_length              : std::integral_constant<size_t, 0> {};
+template <typename... T>
+struct model_length<model<T...>> : std::integral_constant<size_t, sizeof...(T)> {};
+
+template <typename T, typename U>
+struct model_append                 { using type = model<T, U>; };
+template <typename... T, typename U>
+struct model_append<model<T...>, U> { using type = model<T..., U>; };
+
+template <typename Tp>
+struct model_reverse { using type = Tp; };
+template <typename T1, typename... T>
+struct model_reverse<model<T1, T...>>
 {
-    using type = Tp;
+    using head = typename model_reverse<model<T...>>::type;
+    using type = typename model_append<head, T1>::type;
 };
 
 template <typename... T>
 struct layout
 {
-    using model_t = typename capo::types_reverse<model<T...>>::type;
+    using model_t = typename model_reverse<model<T...>>::type;
 
     template <typename U, typename V>
     struct rep;
@@ -221,7 +238,7 @@ struct layout
     static auto & get(U&& tar)
     {
         decltype(auto) mm = reinterpret_cast<typename rep<U&&, model_t>::type>(tar);
-        return static_cast<typename strip<model_t, capo::types_size<model_t>::value - N - 1>::type &>(mm).m_;
+        return static_cast<typename model_strip<model_t, model_length<model_t>::value - N - 1>::type &>(mm).m_;
     }
 };
 
@@ -248,7 +265,15 @@ struct bindings_base
     }
 
     template <typename T, typename U>
-    static bool apply(const T& tp, U&& tar)
+    static auto apply(const T& tp, U&& tar)
+        -> typename std::enable_if<std::is_pointer<typename std::remove_reference<U>::type>::value, bool>::type
+    {
+        return apply<0>(tp, *std::forward<U>(tar));
+    }
+
+    template <typename T, typename U>
+    static auto apply(const T& tp, U&& tar)
+        -> typename std::enable_if<!std::is_pointer<typename std::remove_reference<U>::type>::value, bool>::type
     {
         return apply<0>(tp, std::forward<U>(tar));
     }
@@ -278,14 +303,14 @@ struct constructor : type<C>
     }
 };
 
-template <typename... T>
-struct is_pattern<constructor<T...>> : std::true_type{};
-
 template <typename C, typename... T>
-inline auto case_cons(T&&... args)
-    -> constructor<C, decltype(filter(std::forward<T>(args)))...>
+struct is_pattern<constructor<C, T...>> : std::true_type{};
+
+template <typename T = wildcard, typename... P>
+inline auto C(P&&... args)
+    -> constructor<T, decltype(filter(std::forward<P>(args)))...>
 {
-    return { filter(std::forward<T>(args))... };
+    return { filter(std::forward<P>(args))... };
 }
 
 #define MATCH_REGIST_TYPE(TYPE, ...)                                      \
@@ -295,9 +320,8 @@ inline auto case_cons(T&&... args)
         {                                                                 \
             using layout_t = layout<__VA_ARGS__>;                         \
         };                                                                \
+        template <> struct bindings<TYPE*> : bindings<TYPE> {};           \
     }
-
-#define Cons match::case_cons
 
 /*
  * "filter" is a common function used to provide convenience to the users by converting 
@@ -351,7 +375,7 @@ inline auto filter(T&& arg)
 
 #define MATCH_CASE_ARG_(N, ...) && ( match::filter( CAPO_PP_A_(N, __VA_ARGS__) )( std::get<N - 1>(target_) ) )
 #define Case(...) \
-        } else if (true CAPO_PP_REPEAT_(CAPO_PP_COUNT_(__VA_ARGS__), MATCH_CASE_ARG_, __VA_ARGS__)) {
+        } else if ( true CAPO_PP_REPEAT_(CAPO_PP_COUNT_(__VA_ARGS__), MATCH_CASE_ARG_, __VA_ARGS__) ) {
 
 #define Otherwise() \
         } else {

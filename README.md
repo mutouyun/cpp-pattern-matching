@@ -84,8 +84,8 @@ MATCH_REGIST_TYPE(xx_t, int, double, xx_t*, Foo)
 int a;
 Match(xx)
 {
-    Case(Cons<xx_t>(_, 2.0, nullptr, _)) std::cout << "(_, 2.0, nullptr, _)" << std::endl;
-    Case(Cons<xx_t>(a, _  , nullptr, _)) std::cout << "(a, _, nullptr, _): a = " << a << std::endl;
+    Case(C<xx_t>(_, 2.0, nullptr, _)) std::cout << "(_, 2.0, nullptr, _)" << std::endl;
+    Case(C<xx_t>(a, _  , nullptr, _)) std::cout << "(a, _, nullptr, _): a = " << a << std::endl;
 }
 EndMatch
 
@@ -103,9 +103,9 @@ Match(a, b)
 EndMatch
 
 /*
- * You can define your own converter for some special case.
- * The custom converter will work when the case argument accords with it.
- * If the argument matches more than one converter, you would get an ambiguity compile error.
+ * You could define your own converter for some special case to cooperate with a custom pattern.
+ * The converter will work when the case argument accords with it.
+ * If the argument accords more than one converter, you would get an ambiguity compile error.
 */
 namespace match
 {
