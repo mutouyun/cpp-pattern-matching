@@ -59,6 +59,21 @@ void test_predicate(void)
     EndMatch
 }
 
+void test_regex(void)
+{
+    TEST_CASE_();
+
+    std::string str = "\\w+(\\.\\w+)*@\\w+(\\.\\w+)+";
+    Match("memleak@darkc.at")
+    {
+        Case("Hello World") std::cout << 1 << std::endl;
+        Case("I Love You")  std::cout << 2 << std::endl;
+        Case(Regex(str))    std::cout << 3 << std::endl;
+        Otherwise()         std::cout << "Otherwise..." << std::endl;
+    }
+    EndMatch
+}
+
 class Foo
 {
 public:
@@ -220,6 +235,7 @@ int main(void)
 {
     test_constant_variable();
     test_predicate();
+    test_regex();
     test_type();
     test_constructor();
     test_sequence();

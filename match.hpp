@@ -3,6 +3,8 @@
 #include "capo/preprocessor.hpp"
 
 #include <utility>     // std::forward
+#include <regex>       // std::regex, std::regex_match
+#include <string>      // std::string
 #include <tuple>       // std::tuple
 #include <type_traits> // std::add_pointer, std::remove_reference, ...
 #include <cstddef>     // size_t
@@ -95,9 +97,9 @@ struct predicate
     F judge_;
 
     template <typename U>
-    bool operator()(U&& x) const
+    bool operator()(U&& tar) const
     {
-        return !!(this->judge_(x));
+        return !!(this->judge_(std::forward<U>(tar)));
     }
 };
 
@@ -127,6 +129,31 @@ inline auto converter(T&& arg)
 {
     return { std::forward<T>(arg) };
 }
+
+/*
+ * Regular expression pattern
+*/
+
+struct regex
+{
+    std::regex r_;
+
+    template <typename T>
+    regex(T&& r) 
+        : r_(std::forward<T>(r))
+    {}
+
+    template <typename U>
+    bool operator()(U&& tar) const
+    {
+        return std::regex_match(std::forward<U>(tar), r_);
+    }
+};
+
+template <>
+struct is_pattern<regex> : std::true_type{};
+
+#define Regex(...) match::regex { __VA_ARGS__ }
 
 /*
  * Type pattern
@@ -175,7 +202,7 @@ struct type<T, true>
 template <typename T, bool Cond>
 struct is_pattern<type<T, Cond>> : std::true_type{};
 
-#define Type(...) match::type<__VA_ARGS__>{}
+#define Type(...) match::type<__VA_ARGS__> {}
 
 /*
  * Constructor pattern
