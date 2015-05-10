@@ -1,6 +1,6 @@
 # match-case
 ML-style pattern matching in C++.  
-The code has been compiled in MSVC-2005-CTP & g++-4.9.1(-std=c++1y).
+The code has been compiled in MSVC-2005-CTP & g++-4.9.2(-std=c++1y).
  
 For using it, you only need to include match.hpp.  
 Some examples:
