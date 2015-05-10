@@ -90,7 +90,20 @@ Match(xx)
 EndMatch
 
 /*
- * You can match more than one condition at the same time.
+ * Sequence pattern
+*/
+#include <list>
+std::list<int> ll = { 1, 2, 3 };
+Match(ll)
+{
+    Case(S(1, _, _)) std::cout << "{ 1, 2, 3 } matchs: " << "(1, _, _)" << std::endl;
+    Case(S(_, 1, _)) std::cout << "{ 1, 2, 3 } matchs: " << "(_, 1, _)" << std::endl;
+    Case(S(_, _, 1)) std::cout << "{ 1, 2, 3 } matchs: " << "(_, _, 1)" << std::endl;
+}
+EndMatch
+
+/*
+ * You can match more than one pattern at the same time.
 */
 int a = 3, b = 321;
 Match(a, b)
