@@ -191,10 +191,9 @@ template <typename T>
 struct type<T, true>
 {
     template <typename U>
-    bool operator()(const U& tar) const
+    bool operator()(U&& tar) const
     {
-        using p_t = typename std::add_pointer<
-                    typename std::add_const<typename underly<T>::type>::type>::type;
+        using p_t = typename underly<T>::type const *;
         return (dynamic_cast<p_t>(addr(tar)) != nullptr);
     }
 };

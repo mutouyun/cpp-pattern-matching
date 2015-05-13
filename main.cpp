@@ -95,7 +95,7 @@ void test_type(void)
 {
     TEST_CASE_();
 
-    Foo* foo = new Bar<2>;
+    Foo& foo = *(new Bar<2>);
     Match(foo)
     {
         Case(Type(Bar<1>)) std::cout << "Bar<1>" << std::endl;
