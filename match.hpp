@@ -14,7 +14,7 @@ namespace match {
 // To remove reference and cv qualification from a type.
 
 template <typename T>
-struct underly : std::remove_cv<typename std::remove_reference<T>::type> {};
+struct underlying : std::remove_cv<typename std::remove_reference<T>::type> {};
 
 // The helper meta-predicate capable of distinguishing all our patterns.
 
@@ -22,7 +22,7 @@ template <typename T>
 struct is_pattern : std::false_type {};
 
 template <typename T>
-struct pattern_checker : is_pattern<typename underly<T>::type> {};
+struct pattern_checker : is_pattern<typename underlying<T>::type> {};
 
 /*
  * Constant pattern
@@ -121,7 +121,7 @@ template <typename T> struct is_closure_<T, true>  : std::true_type  {};
 template <typename T> struct is_closure_<T, false> : std::false_type {};
 
 template <typename T>
-struct is_closure : is_closure_<typename underly<T>::type> {};
+struct is_closure : is_closure_<typename underlying<T>::type> {};
 
 template <typename T>
 inline auto converter(T&& arg)
@@ -164,7 +164,7 @@ template <typename T> inline       T* addr(      T* t) { return t; }
 template <typename T> inline const T* addr(const T& t) { return std::addressof(t); }
 template <typename T> inline       T* addr(      T& t) { return std::addressof(t); }
 
-template <typename T, bool = std::is_polymorphic<typename underly<T>::type>::value>
+template <typename T, bool = std::is_polymorphic<typename underlying<T>::type>::value>
 struct type;
 
 template <>
@@ -193,7 +193,7 @@ struct type<T, true>
     template <typename U>
     bool operator()(U&& tar) const
     {
-        using p_t = typename underly<T>::type const *;
+        using p_t = typename underlying<T>::type const *;
         return (dynamic_cast<p_t>(addr(tar)) != nullptr);
     }
 };
@@ -292,14 +292,14 @@ struct bindings_base
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<std::is_pointer<typename underly<U>::type>::value, bool>::type
+        -> typename std::enable_if<std::is_pointer<typename underlying<U>::type>::value, bool>::type
     {
         return apply<0>(tp, *std::forward<U>(tar));
     }
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<!std::is_pointer<typename underly<U>::type>::value, bool>::type
+        -> typename std::enable_if<!std::is_pointer<typename underlying<U>::type>::value, bool>::type
     {
         return apply<0>(tp, std::forward<U>(tar));
     }
@@ -323,7 +323,7 @@ struct constructor : type<C>
     {
         if ( type<C>::operator()(std::forward<U>(tar)) )
         {
-            return bindings<typename underly<U>::type>::apply(tp_, std::forward<U>(tar));
+            return bindings<typename underlying<U>::type>::apply(tp_, std::forward<U>(tar));
         }
         return false;
     }
