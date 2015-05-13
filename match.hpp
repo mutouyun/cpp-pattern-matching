@@ -181,7 +181,7 @@ template <typename T>
 struct type<T, false>
 {
     template <typename U>
-    bool operator()(const U&) const
+    bool operator()(const volatile U&) const
     {
         return std::is_same<U, T>::value;
     }
@@ -193,7 +193,7 @@ struct type<T, true>
     template <typename U>
     bool operator()(U&& tar) const
     {
-        using p_t = typename underlying<T>::type const *;
+        using p_t = typename underlying<T>::type const volatile *;
         return (dynamic_cast<p_t>(addr(tar)) != nullptr);
     }
 };
