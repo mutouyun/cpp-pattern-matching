@@ -183,7 +183,7 @@ struct type<T, false>
     template <typename U>
     bool operator()(const volatile U&) const
     {
-        return std::is_same<U, T>::value;
+        return std::is_same<typename underlying<T>::type, U>::value;
     }
 };
 
