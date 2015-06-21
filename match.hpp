@@ -1,3 +1,8 @@
+/*
+    cpp-match-case - Code covered by the MIT License
+    Author: mutouyun (http://darkc.at)
+*/
+
 #pragma once
 
 #include "capo/preprocessor.hpp"
