@@ -81,16 +81,10 @@ struct wildcard
     }
 };
 
+constexpr wildcard _;
+
 template <>
 struct is_pattern<wildcard> : std::true_type{};
-
-#if defined(_MSC_VER)
-__pragma(warning(suppress:4100)) static wildcard _;
-#elif defined(__GNUC__)
-__attribute__((__unused__)) static wildcard _;
-#else
-static wildcard _;
-#endif
 
 /*
  * Predicate pattern, for lambda-expressions or other callable objects.
