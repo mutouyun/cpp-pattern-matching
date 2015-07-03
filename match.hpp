@@ -74,6 +74,8 @@ struct is_pattern<variable<T>> : std::true_type {};
 
 struct wildcard
 {
+    constexpr wildcard(void) {}
+
     template <typename U>
     bool operator()(U&&) const
     {
