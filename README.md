@@ -1,6 +1,20 @@
 # A C++ Pattern Matching Library
 ML-style pattern matching in C++.  
-The codes has been compiled in MSVC-2005-CTP / g++-4.9.2(-std=c++1y) / clang-3.5.0-4(-std=c++1y).
+The codes has been compiled in:  
+ - MSVC-2015-CTP  
+ - g++-4.9.2(-std=c++1y)  
+ - clang-3.5.0-4(-std=c++1y)
+ 
+Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:  
+http://www.stroustrup.com/OpenPatternMatching.pdf  
+And we can find their codes here:  
+http://parasol.tamu.edu/mach7/  
+ 
+Their library is very powerful and big, maybe a little complicated.  
+Compared with their library, mine is very small and simple.  
+ 
+If you just want to use a pattern matching in C++ quickly,   
+and don't like to read doc & study usage, maybe you could try my library.
 # License
 Codes covered by the MIT License.
 # Tutorial
@@ -134,13 +148,3 @@ namespace match
 }
 #include "match.hpp"
 ```
-Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:  
-http://www.stroustrup.com/OpenPatternMatching.pdf  
-And we can find their codes here:  
-http://parasol.tamu.edu/mach7/  
- 
-Their library is very powerful and big, maybe a little complicated.  
-Compared with their library, mine is very small and simple.  
- 
-If you just want to use a pattern matching in C++ quickly, 
-and don't like to read doc & study usage, maybe you could try my library.
