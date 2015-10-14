@@ -1,7 +1,9 @@
-# C++ Pattern Matching
+# A C++ Pattern Matching Library
 ML-style pattern matching in C++.  
-The code has been compiled in MSVC-2005-CTP / g++-4.9.2(-std=c++1y) / clang-3.5.0-4(-std=c++1y).
- 
+The codes has been compiled in MSVC-2005-CTP / g++-4.9.2(-std=c++1y) / clang-3.5.0-4(-std=c++1y).
+# License
+Codes covered by the MIT License.
+# Tutorial
 For using it, you only need to include match.hpp.  
 Some examples:
 ```cpp
@@ -140,4 +142,5 @@ http://parasol.tamu.edu/mach7/
 Their library is very powerful and big, maybe a little complicated.  
 Compared with their library, mine is very small and simple.  
  
-If you just want to use a pattern matching in C++ quickly, and don't like to read doc & study usage, maybe you could try my library.
+If you just want to use a pattern matching in C++ quickly, 
+and don't like to read doc & study usage, maybe you could try my library.
