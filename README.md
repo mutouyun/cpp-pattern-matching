@@ -1,4 +1,4 @@
-# match-case
+# C++ Pattern Matching
 ML-style pattern matching in C++.  
 The code has been compiled in MSVC-2005-CTP / g++-4.9.2(-std=c++1y) / clang-3.5.0-4(-std=c++1y).
  
