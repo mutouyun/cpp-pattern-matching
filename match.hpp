@@ -19,7 +19,7 @@ namespace match {
 // To remove reference and cv qualification from a type.
 
 template <typename T>
-struct underlying : std::remove_cv<typename std::remove_reference<T>::type> {};
+using underlying = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
 // The helper meta-predicate capable of distinguishing all our patterns.
 
@@ -27,7 +27,7 @@ template <typename T>
 struct is_pattern : std::false_type {};
 
 template <typename T>
-struct pattern_checker : is_pattern<typename underlying<T>::type> {};
+struct pattern_checker : is_pattern<underlying<T>> {};
 
 /*
  * Constant pattern
@@ -113,7 +113,7 @@ struct is_functor_checker_
     template <typename T> static std::false_type check(...);
 };
 template <typename T>
-struct is_functor : decltype(is_functor_checker_::check<T>(nullptr)) {};
+using is_functor = decltype(is_functor_checker_::check<T>(nullptr));
 
 template <typename T, bool = std::is_function<typename std::remove_pointer<T>::type>::value || 
                                   is_functor<T>::value>
@@ -122,7 +122,7 @@ template <typename T> struct is_closure_<T, true>  : std::true_type  {};
 template <typename T> struct is_closure_<T, false> : std::false_type {};
 
 template <typename T>
-struct is_closure : is_closure_<typename underlying<T>::type> {};
+struct is_closure : is_closure_<underlying<T>> {};
 
 template <typename T>
 inline auto converter(T&& arg)
@@ -165,7 +165,7 @@ template <typename T> inline       T* addr(      T* t) { return t; }
 template <typename T> inline const T* addr(const T& t) { return std::addressof(t); }
 template <typename T> inline       T* addr(      T& t) { return std::addressof(t); }
 
-template <typename T, bool = std::is_polymorphic<typename underlying<T>::type>::value>
+template <typename T, bool = std::is_polymorphic<underlying<T>>::value>
 struct type;
 
 template <>
@@ -184,7 +184,7 @@ struct type<T, false>
     template <typename U>
     bool operator()(const volatile U&) const
     {
-        return std::is_same<typename underlying<T>::type, U>::value;
+        return std::is_same<underlying<T>, U>::value;
     }
 };
 
@@ -194,7 +194,7 @@ struct type<T, true>
     template <typename U>
     bool operator()(U&& tar) const
     {
-        using p_t = typename underlying<T>::type const volatile *;
+        using p_t = underlying<T> const volatile *;
         return (dynamic_cast<p_t>(addr(tar)) != nullptr);
     }
 };
@@ -293,14 +293,14 @@ struct bindings_base
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<std::is_pointer<typename underlying<U>::type>::value, bool>::type
+        -> typename std::enable_if<std::is_pointer<underlying<U>>::value, bool>::type
     {
         return apply<0>(tp, *std::forward<U>(tar));
     }
 
     template <typename T, typename U>
     static auto apply(const T& tp, U&& tar)
-        -> typename std::enable_if<!std::is_pointer<typename underlying<U>::type>::value, bool>::type
+        -> typename std::enable_if<!std::is_pointer<underlying<U>>::value, bool>::type
     {
         return apply<0>(tp, std::forward<U>(tar));
     }
@@ -324,7 +324,7 @@ struct constructor : type<C>
     {
         if ( type<C>::operator()(std::forward<U>(tar)) )
         {
-            return bindings<typename underlying<U>::type>::apply(tp_, std::forward<U>(tar));
+            return bindings<underlying<U>>::apply(tp_, std::forward<U>(tar));
         }
         return false;
     }
@@ -452,7 +452,9 @@ inline auto S(P&&... args)
         auto target_ = std::forward_as_tuple(__VA_ARGS__); \
         if (false)
 
-#define MATCH_CASE_ARG_(N, ...) && ( match::filter( CAPO_PP_A_(N, __VA_ARGS__) )( std::get<N - 1>(target_) ) )
+#define MATCH_CASE_ARG_(N, ...) && ( match::filter/*<typename std::tuple_element<N - 1, decltype(target_)>::type>*/ \
+                                ( CAPO_PP_A_(N, __VA_ARGS__) )                                                  \
+                                ( std::get<N - 1>(std::move(target_)) ) )
 #define P(...)                  ( true CAPO_PP_REPEAT_(CAPO_PP_COUNT_(__VA_ARGS__), MATCH_CASE_ARG_, __VA_ARGS__) )
 
 #define With(...) \
