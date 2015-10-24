@@ -45,31 +45,16 @@ void test_constant_variable(void)
     std::cout << fac(10) << " " << fac(-10) << std::endl;
 }
 
-struct tester
-{
-    template <typename T>
-    constexpr bool operator()(T) const { return std::is_integral<T>::value; }
-};
-
 void test_predicate(void)
 {
     TEST_CASE_();
 
     Match(5)
     {
-        Case([](auto x) { return (x & 1); })
+        Case([](int x) { return (x & 1); })
             std::cout << "odd" << std::endl;
         Otherwise()
             std::cout << "even" << std::endl;
-    }
-    EndMatch
-
-    Match(5)
-    {
-        Case(tester{})
-            std::cout << "is integral" << std::endl;
-        Otherwise()
-            std::cout << "not integral" << std::endl;
     }
     EndMatch
 }

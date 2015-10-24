@@ -115,17 +115,8 @@ struct is_functor_checker_
 template <typename T>
 using is_functor = decltype(is_functor_checker_::check<T>(nullptr));
 
-struct is_functor_template_checker_
-{
-    template <typename T> static std::true_type  check(decltype(&T::template operator())*);
-    template <typename T> static std::false_type check(...);
-};
-template <typename T>
-using is_functor_template = decltype(is_functor_template_checker_::check<T>(nullptr));
-
 template <typename T, bool = std::is_function<typename std::remove_pointer<T>::type>::value || 
-                                  is_functor<T>::value ||
-                                  is_functor_template<T>::value>
+                                  is_functor<T>::value>
 struct is_closure_;
 template <typename T> struct is_closure_<T, true>  : std::true_type  {};
 template <typename T> struct is_closure_<T, false> : std::false_type {};
