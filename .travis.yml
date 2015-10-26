@@ -9,7 +9,7 @@ install:
   - if [ "$CC" == "gcc" ]; then sudo apt-get -qq update; fi
   - if [ "$CC" == "gcc" ]; then sudo apt-get -qq install g++-4.9; fi
   - if [ "$CC" == "gcc" ]; then sudo apt-get -qq install gcc-4.9-multilib g++-4.9-multilib; fi
-  - if [ "$CC" == "gcc" ]; then then export CC=gcc-4.9 CXX=g++-4.9; fi
+  - if [ "$CC" == "gcc" ]; then export CC=gcc-4.9 CXX=g++-4.9; fi
   - if [ "$CC" == "clang" ]; then sudo apt-get -qq install gcc-multilib g++-multilib; fi
   - export CX=$CXX
   - $CX --version
