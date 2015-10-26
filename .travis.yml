@@ -9,13 +9,13 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-4.8
-      - g++-4.8
+      - gcc-4.9
+      - g++-4.9
       - clang
 
 install:
-  - sudo apt-get -qq install gcc-4.8-multilib g++-4.8-multilib
-  - if [ "$CC" == "gcc" ]; then export CC=gcc-4.8 CXX=g++-4.8; fi
+  - sudo apt-get -qq install gcc-4.9-multilib g++-4.9-multilib
+  - if [ "$CC" == "gcc" ]; then export CC=gcc-4.9 CXX=g++-4.9; fi
   - export CX=$CXX
   - $CX --version
 
