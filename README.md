@@ -1,9 +1,12 @@
 # A C++ Pattern Matching Library
-ML-style pattern matching in C++.  
-The codes has been compiled in:  
- - MSVC-2015-CTP  
+
+[![Build Status](https://travis-ci.org/mutouyun/cpp-pattern-matching.svg?branch=master)](https://travis-ci.org/mutouyun/cpp-pattern-matching)
+
+ML-style pattern matching in C++.
+# Compiler Support
+ - MSVC-2015  
  - g++-4.9.2(-std=c++1y)  
- - clang-3.5.0-4(-std=c++1y)
+ - clang-3.4(-std=c++1y)
  
 Yuriy Solodkyy, Gabriel Dos Reis, Bjarne Stroustrup had written a paper:  
 http://www.stroustrup.com/OpenPatternMatching.pdf  
