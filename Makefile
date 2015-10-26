@@ -1,20 +1,28 @@
 # Compiler, tools and options
 
-CC = gcc
-CX = g++
-LB = ar -csr
-DEFINES =
-CFLAGS = -pipe -frtti -Wall -Wextra -fexceptions -march=nocona -c -std=c++1y
-LFLAGS = -Wl,-s
-INCPATH = -I"./"
+CC ?= gcc
+CX ?= g++
+LB ?= ar -csr
+DEFINES ?=
+CFLAGS ?= -pipe -frtti -Wall -Wextra -fexceptions -march=nocona -c -std=c++1y
+LFLAGS ?= -Wl,-s
+INCPATH ?= -I"./"
 
-CFLAGS += -O2 -DNDEBUG
-Configuration = release
+debug = 0
+ifeq ($(debug), 0)
+	# release
+	CFLAGS += -O2 -DNDEBUG
+	CONFIG_DIR = release
+else
+	# debug
+	CFLAGS += -g
+	CONFIG_DIR = debug
+endif
 
 # Output directory
 
-OUT = ./build/bin/$(Configuration)/$(CC)
-TMP = ./build/tmp/$(Configuration)/$(CC)
+OUT = ./build/bin/$(CONFIG_DIR)/$(CC)
+TMP = ./build/tmp/$(CONFIG_DIR)/$(CC)
 
 # Build rules
 
