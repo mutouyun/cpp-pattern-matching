@@ -1,6 +1,7 @@
 # A C++ Pattern Matching Library
 
 [![Build Status](https://travis-ci.org/mutouyun/cpp-pattern-matching.svg?branch=master)](https://travis-ci.org/mutouyun/cpp-pattern-matching)
+[![Build status](https://ci.appveyor.com/api/projects/status/3la9m4ddps5uj3ls/branch/master?svg=true)](https://ci.appveyor.com/project/mutouyun/cpp-pattern-matching)
 
 ML-style pattern matching in C++.
 # Compiler Support
