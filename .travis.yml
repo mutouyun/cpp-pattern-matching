@@ -1,16 +1,35 @@
 language: cpp
 
-compiler: 
-  - gcc
-  - clang
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env:
+        - CXX=g++-4.9
+        - CX=g++-4.9
+        - CC=gcc-4.9
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - clang-3.4
+            - g++-4.8
+      env:
+        - CXX=clang++
+        - CX=clang++
+        - CC=clang
 
 install:
-  - if [ "$CC" == "gcc" ]; then sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test; fi
-  - if [ "$CC" == "gcc" ]; then sudo apt-get -qq update; fi
-  - if [ "$CC" == "gcc" ]; then sudo apt-get -qq install g++-4.9; fi
-  - if [ "$CC" == "gcc" ]; then sudo apt-get -qq install gcc-4.9-multilib g++-4.9-multilib; fi
-  - if [ "$CC" == "gcc" ]; then export CC=gcc-4.9 CXX=g++-4.9; fi
-  - export CX=$CXX
   - $CX --version
 
 script: make
